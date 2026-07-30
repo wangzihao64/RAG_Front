@@ -18,7 +18,15 @@ interface CollectionsResponse {
   contexts: unknown;
 }
 
-export default function KnowledgeSidebar() {
+interface KnowledgeSidebarProps {
+  selectedCollectionId: number | null;
+  onSelectCollection: (id: number) => void;
+}
+
+export default function KnowledgeSidebar({
+  selectedCollectionId,
+  onSelectCollection,
+}: KnowledgeSidebarProps) {
   const [collections, setCollections] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -130,18 +138,30 @@ export default function KnowledgeSidebar() {
         ) : collections.length === 0 ? (
           <div className="text-sm text-gray-500">暂无知识库</div>
         ) : (
-          collections.map((item) => (
-            <div
-              key={item.id}
-              className="group rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700"
-              title={item.description || '暂无描述'}
-            >
-              <div>{item.name}</div>
-              <div className="mt-1 text-xs text-gray-500 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                {item.description || '暂无描述'}
-              </div>
-            </div>
-          ))
+          collections.map((item) => {
+            const isSelected = item.id === selectedCollectionId;
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => onSelectCollection(item.id)}
+                className={
+                  `group w-full text-left rounded-lg border px-3 py-2 text-sm transition ${
+                    isSelected
+                      ? 'border-indigo-500 bg-indigo-50 text-indigo-900'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                  }`
+                }
+                title={item.description || '暂无描述'}
+              >
+                <div>{item.name}</div>
+                <div className="mt-1 text-xs text-gray-500 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                  {item.description || '暂无描述'}
+                </div>
+              </button>
+            );
+          })
         )}
       </div>
 

@@ -16,6 +16,7 @@ export default function KnowledgePage() {
   const [leftWidth, setLeftWidth] = useState(240);
   const [middleWidth, setMiddleWidth] = useState(420);
   const [resizeTarget, setResizeTarget] = useState<ResizeTarget>(null);
+  const [selectedCollectionId, setSelectedCollectionId] = useState<number | null>(null);
   const [dragStartX, setDragStartX] = useState(0);
   const [dragStartLeftWidth, setDragStartLeftWidth] = useState(240);
   const [dragStartMiddleWidth, setDragStartMiddleWidth] = useState(420);
@@ -91,7 +92,10 @@ export default function KnowledgePage() {
 
         <div ref={containerRef} className="flex items-stretch gap-0 lg:gap-0">
           <div className="min-h-[420px] px-2" style={{ width: leftWidth }}>
-            <KnowledgeSidebar />
+            <KnowledgeSidebar
+              selectedCollectionId={selectedCollectionId}
+              onSelectCollection={setSelectedCollectionId}
+            />
           </div>
 
           <div
@@ -100,7 +104,7 @@ export default function KnowledgePage() {
           />
 
           <div className="min-h-[420px] px-2" style={{ width: middleWidth }}>
-            <KnowledgeList />
+            <KnowledgeList collectionId={selectedCollectionId} />
           </div>
 
           <div
