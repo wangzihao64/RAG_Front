@@ -1,19 +1,15 @@
 export default function KnowledgeSidebar() {
   return (
-    <div className="space-y-4">
-      <div>
+    <div className="h-full rounded-xl border border-gray-100 bg-gray-50/70 p-4">
+      <div className="flex items-center justify-between pt-1">
         <div className="text-sm font-semibold text-gray-900">个人知识库</div>
-        <div className="mt-2 rounded-lg border border-gray-100 bg-white p-3 text-gray-700">Www的知识库</div>
-      </div>
-
-      <div>
-        <div className="text-sm font-semibold text-gray-900">共享知识库</div>
-        <div className="mt-2 rounded-lg border border-gray-100 bg-white p-3 text-gray-700">个人信息</div>
-      </div>
-
-      <div>
-        <div className="text-sm font-semibold text-gray-900">订阅</div>
-        <div className="mt-2 rounded-lg border border-gray-100 bg-white p-3 text-gray-700">去发现更多知识库</div>
+        <button
+          type="button"
+          className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white text-lg text-gray-700 transition hover:bg-gray-100"
+          aria-label="新增知识库"
+        >
+          +
+        </button>
       </div>
     </div>
   );
