@@ -122,15 +122,16 @@ export function RagDemoChat() {
   return (
     <div
       ref={containerRef}
-      className="max-w-2xl mx-auto rounded-2xl border border-gray-200 overflow-hidden shadow-sm"
+      className="max-w-2xl mx-auto rounded-2xl border border-gray-200 overflow-hidden shadow-sm bg-white"
     >
-      <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+      <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
+        <span className="w-2 h-2 rounded-full bg-emerald-400" />
         <span className="text-sm text-gray-500">示例：产品文档知识库</span>
       </div>
       <div className="p-6 space-y-4 min-h-[220px]">
         {(userText || userTyping) && (
           <div className="flex justify-end">
-            <div className="bg-gray-900 text-white px-4 py-2 rounded-2xl rounded-br-md max-w-[80%] text-sm">
+            <div className="bg-gray-900 text-white px-4 py-2 rounded-2xl rounded-br-md max-w-[85%] sm:max-w-[80%] text-sm">
               {userText}
               <TypingCursor visible={userTyping} />
             </div>

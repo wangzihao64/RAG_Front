@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AMemoryI",
-  description: "AMemoryI",
+  title: "AMemoryI — 你的 RAG 智能知识库",
+  description:
+    "AMemoryI 是基于 RAG 的智能知识库。上传文档与笔记，用自然语言提问，即可获得带引用来源的精准答案。",
 };
 
 export default function RootLayout({
@@ -24,10 +25,10 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang="zh-CN"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
   );
 }
