@@ -63,7 +63,7 @@ const faqs = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 via-white to-white">
+    <div className="min-h-screen bg-white">
       <SiteHeader />
 
       <main>
