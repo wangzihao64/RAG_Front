@@ -44,8 +44,8 @@ export function LoginForm() {
 
       saveAuthToken(token);
       setStatus('success');
-      setMessage('登录成功，正在跳转...');
-      router.push('/');
+      setMessage('登录成功，正在跳转到知识库...');
+      router.push('/knowledge');
     } catch (error) {
       setStatus('error');
       setMessage('无法连接到服务器，请稍后再试。');
