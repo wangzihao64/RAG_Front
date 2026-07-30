@@ -1,3 +1,4 @@
+import { RagDemoChat } from './components/rag-demo-chat';
 import { BookOpenText, FileText, MessageCircle, Upload } from 'lucide-react';
 
 export default function Home() {
@@ -76,30 +77,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="max-w-2xl mx-auto rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-            <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
-              <span className="text-sm text-gray-500">示例：产品文档知识库</span>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="flex justify-end">
-                <div className="bg-gray-900 text-white px-4 py-2 rounded-2xl rounded-br-md max-w-[80%] text-sm">
-                  我们的退款政策是什么？7 天内可以退吗？
-                </div>
-              </div>
-              <div className="flex justify-start">
-                <div className="bg-gray-100 text-gray-900 px-4 py-3 rounded-2xl rounded-bl-md max-w-[85%] text-sm">
-                  <p className="mb-2">根据您上传的《产品手册》，退款政策如下：</p>
-                  <p className="text-gray-700 mb-3">
-                    购买后 7 天内，未使用的产品可申请全额退款。需提供订单号，审核通过后 3–5 个工作日原路退回。
-                  </p>
-                  <span className="inline-flex items-center gap-1 text-xs bg-white px-2 py-1 rounded border border-gray-200 text-gray-600">
-                    <FileText className="w-3 h-3" />
-                    产品手册.pdf · 第 3 章
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <RagDemoChat />
         </section>
       </div>
     </div>
