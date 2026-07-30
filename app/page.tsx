@@ -89,7 +89,7 @@ export default function Home() {
               <ArrowRight className="w-4 h-4" />
             </a>
             <a
-              href="/"
+              href="/login"
               className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 rounded-full font-medium border border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-colors"
             >
               登录

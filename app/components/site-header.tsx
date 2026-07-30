@@ -31,7 +31,7 @@ export function SiteHeader() {
             </a>
           ))}
           <a
-            href="#login"
+            href="/login"
             className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
           >
             登录
@@ -68,7 +68,7 @@ export function SiteHeader() {
           ))}
           <div className="pt-3 flex gap-3">
             <a
-              href="#login"
+              href="/login"
               className="flex-1 text-center py-2.5 text-sm font-medium border border-gray-200 rounded-full text-gray-900"
               onClick={() => setMenuOpen(false)}
             >

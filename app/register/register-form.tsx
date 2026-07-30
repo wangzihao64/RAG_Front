@@ -56,13 +56,13 @@ export function RegisterForm() {
 
       <form className="space-y-5" onSubmit={handleSubmit}>
         <label className="block">
-          <span className="text-sm font-medium text-gray-900">姓名</span>
+          <span className="text-sm font-medium text-gray-900">用户名</span>
           <input
             name="username"
             type="text"
             value={username}
             onChange={(event) => setUsername(event.target.value)}
-            placeholder="例如：张三"
+            placeholder="例如：yourusername"
             className="mt-3 w-full rounded-3xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition-shadow focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
           />
         </label>
