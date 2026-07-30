@@ -37,7 +37,7 @@ export function SiteHeader() {
             登录
           </a>
           <a
-            href="#login"
+            href="/register"
             className="text-sm font-medium bg-gray-900 text-white px-5 py-2 rounded-full hover:bg-gray-800 transition-colors"
           >
             免费注册
@@ -75,7 +75,7 @@ export function SiteHeader() {
               登录
             </a>
             <a
-              href="#login"
+              href="/register"
               className="flex-1 text-center py-2.5 text-sm font-medium bg-gray-900 text-white rounded-full"
               onClick={() => setMenuOpen(false)}
             >

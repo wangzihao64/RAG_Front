@@ -82,7 +82,7 @@ export default function Home() {
           </p>
           <div id="login" className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
             <a
-              href="/"
+              href="/register"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gray-900 text-white px-8 py-3 rounded-full font-medium hover:bg-gray-800 transition-colors"
             >
               免费注册
