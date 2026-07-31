@@ -1,4 +1,5 @@
 import { RagDemoChat } from './components/rag-demo-chat';
+import { TypewriterKnowledgeButton } from './components/typewriter-knowledge-button';
 import { SiteHeader } from './components/site-header';
 import {
   ArrowRight,
@@ -95,6 +96,7 @@ export default function Home() {
               登录
             </a>
           </div>
+          <TypewriterKnowledgeButton />
         </section>
 
         {/* Use case */}
