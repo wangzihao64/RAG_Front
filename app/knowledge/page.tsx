@@ -1,13 +1,17 @@
 'use client';
 
 import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
-import { BookOpen, GripVertical } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, FileText, GripVertical } from 'lucide-react';
 import { SiteHeader } from '../components/site-header';
 import KnowledgeSidebar from '../components/knowledge-sidebar';
 import KnowledgeList from '../components/knowledge-list';
 import KnowledgeDetail from '../components/knowledge-detail';
 
 const MIN_PANEL_WIDTH = 220;
+const SIDEBAR_EXPANDED_WIDTH = 260;
+const SIDEBAR_COLLAPSED_WIDTH = 48;
+const LIST_EXPANDED_WIDTH = 320;
+const LIST_COLLAPSED_WIDTH = 48;
 
 type ResizeTarget = 'left' | 'right' | null;
 
@@ -33,14 +37,17 @@ function ResizeHandle({
 export default function KnowledgePage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
-  const [leftWidth, setLeftWidth] = useState(260);
-  const [middleWidth, setMiddleWidth] = useState(320);
+  const [leftWidth, setLeftWidth] = useState(SIDEBAR_EXPANDED_WIDTH);
+  const [middleWidth, setMiddleWidth] = useState(LIST_EXPANDED_WIDTH);
   const [resizeTarget, setResizeTarget] = useState<ResizeTarget>(null);
   const [selectedCollectionId, setSelectedCollectionId] = useState<number | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<{ id: number; name: string } | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [listCollapsed, setListCollapsed] = useState(false);
+  const [previewCollapsed, setPreviewCollapsed] = useState(false);
   const [dragStartX, setDragStartX] = useState(0);
-  const [dragStartLeftWidth, setDragStartLeftWidth] = useState(260);
-  const [dragStartMiddleWidth, setDragStartMiddleWidth] = useState(320);
+  const [dragStartLeftWidth, setDragStartLeftWidth] = useState(SIDEBAR_EXPANDED_WIDTH);
+  const [dragStartMiddleWidth, setDragStartMiddleWidth] = useState(LIST_EXPANDED_WIDTH);
 
   useEffect(() => {
     setSelectedDocument(null);
@@ -125,33 +132,79 @@ export default function KnowledgePage() {
           ref={containerRef}
           className="flex min-h-[calc(100vh-180px)] overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-[0_8px_30px_rgba(15,23,42,0.06)]"
         >
-          <div className="h-full shrink-0 overflow-hidden" style={{ width: leftWidth }}>
-            <KnowledgeSidebar
-              selectedCollectionId={selectedCollectionId}
-              onSelectCollection={setSelectedCollectionId}
-              onDeleteCollection={() => {
-                setSelectedCollectionId(null);
-                setSelectedDocument(null);
-              }}
-            />
-          </div>
+          {sidebarCollapsed ? (
+            <div
+              className="flex h-full shrink-0 flex-col items-center border-r border-gray-100 bg-gray-50/60 py-4"
+              style={{ width: SIDEBAR_COLLAPSED_WIDTH }}
+            >
+              <button
+                type="button"
+                onClick={() => setSidebarCollapsed(false)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-white hover:text-indigo-600 hover:shadow-sm"
+                title="展开知识库"
+              >
+                <ChevronRight size={16} />
+              </button>
+              <div className="mt-3 flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50">
+                <BookOpen size={14} className="text-indigo-500" />
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="h-full shrink-0 overflow-hidden" style={{ width: leftWidth }}>
+                <KnowledgeSidebar
+                  selectedCollectionId={selectedCollectionId}
+                  onSelectCollection={setSelectedCollectionId}
+                  onDeleteCollection={() => {
+                    setSelectedCollectionId(null);
+                    setSelectedDocument(null);
+                  }}
+                  onCollapse={() => setSidebarCollapsed(true)}
+                />
+              </div>
 
-          <ResizeHandle onMouseDown={(event) => startResize('left', event)} />
+              <ResizeHandle onMouseDown={(event) => startResize('left', event)} />
+            </>
+          )}
 
-          <div className="h-full shrink-0 overflow-hidden" style={{ width: middleWidth }}>
-            <KnowledgeList
-              collectionId={selectedCollectionId}
-              selectedDocumentId={selectedDocument?.id ?? null}
-              onSelectDocument={setSelectedDocument}
-            />
-          </div>
+          {listCollapsed ? (
+            <div
+              className="flex h-full shrink-0 flex-col items-center border-r border-gray-100 bg-gray-50/60 py-4"
+              style={{ width: LIST_COLLAPSED_WIDTH }}
+            >
+              <button
+                type="button"
+                onClick={() => setListCollapsed(false)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-white hover:text-indigo-600 hover:shadow-sm"
+                title="展开文档列表"
+              >
+                <ChevronRight size={16} />
+              </button>
+              <div className="mt-3 flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50">
+                <FileText size={14} className="text-indigo-500" />
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="h-full shrink-0 overflow-hidden" style={{ width: middleWidth }}>
+                <KnowledgeList
+                  collectionId={selectedCollectionId}
+                  selectedDocumentId={selectedDocument?.id ?? null}
+                  onSelectDocument={setSelectedDocument}
+                  onCollapse={() => setListCollapsed(true)}
+                />
+              </div>
 
-          <ResizeHandle onMouseDown={(event) => startResize('right', event)} />
+              <ResizeHandle onMouseDown={(event) => startResize('right', event)} />
+            </>
+          )}
 
           <div className="h-full min-w-0 flex-1 overflow-hidden">
             <KnowledgeDetail
               collectionId={selectedCollectionId}
               selectedDocument={selectedDocument}
+              previewCollapsed={previewCollapsed}
+              onTogglePreview={() => setPreviewCollapsed((prev) => !prev)}
             />
           </div>
         </div>

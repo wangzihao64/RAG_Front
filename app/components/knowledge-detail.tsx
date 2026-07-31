@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { BookOpen, ExternalLink, FileText, Loader2, Maximize2, MessageSquare, Minimize2, Send, Sparkles, X } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronUp, ExternalLink, FileText, Loader2, Maximize2, MessageSquare, Minimize2, Send, Sparkles, X } from 'lucide-react';
 import { buildAuthHeaders } from '../lib/auth';
 
 export interface SelectedDocument {
@@ -12,6 +12,8 @@ export interface SelectedDocument {
 interface KnowledgeDetailProps {
   collectionId: number | null;
   selectedDocument: SelectedDocument | null;
+  previewCollapsed?: boolean;
+  onTogglePreview?: () => void;
 }
 
 type DocumentContent =
@@ -103,7 +105,7 @@ function formatSourceLabel(source: unknown, index: number) {
   return `来源 ${index + 1}`;
 }
 
-export default function KnowledgeDetail({ collectionId, selectedDocument }: KnowledgeDetailProps) {
+export default function KnowledgeDetail({ collectionId, selectedDocument, previewCollapsed = false, onTogglePreview }: KnowledgeDetailProps) {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [value, setValue] = useState('');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -414,52 +416,76 @@ export default function KnowledgeDetail({ collectionId, selectedDocument }: Know
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         {selectedDocument ? (
           <div
-            className={`border-b border-gray-100 bg-slate-50/60 px-5 py-3 ${
-              previewExpanded ? 'flex min-h-0 flex-1 flex-col' : 'shrink-0'
-            }`}
+            className={`border-b border-gray-100 bg-slate-50/60 px-5 ${
+              previewCollapsed ? 'py-2' : 'py-3'
+            } ${previewExpanded && !previewCollapsed ? 'flex min-h-0 flex-1 flex-col' : 'shrink-0'}`}
           >
-            <div className="mb-2 flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Preview</p>
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  onClick={() => setModalOpen(true)}
+                  onClick={() => onTogglePreview?.()}
                   className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-gray-500 transition hover:bg-white hover:text-indigo-600"
-                  title="在新窗口中阅读"
+                  title={previewCollapsed ? '展开文档内容' : '折叠文档内容'}
                 >
-                  <ExternalLink size={12} />
-                  弹窗阅读
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPreviewExpanded((prev) => !prev)}
-                  className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-gray-500 transition hover:bg-white hover:text-indigo-600"
-                >
-                  {previewExpanded ? (
+                  {previewCollapsed ? (
                     <>
-                      <Minimize2 size={12} />
-                      收起
+                      <ChevronDown size={12} />
+                      展开
                     </>
                   ) : (
                     <>
-                      <Maximize2 size={12} />
-                      展开阅读
+                      <ChevronUp size={12} />
+                      折叠
                     </>
                   )}
                 </button>
+                {!previewCollapsed && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setModalOpen(true)}
+                      className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-gray-500 transition hover:bg-white hover:text-indigo-600"
+                      title="在新窗口中阅读"
+                    >
+                      <ExternalLink size={12} />
+                      弹窗阅读
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewExpanded((prev) => !prev)}
+                      className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-gray-500 transition hover:bg-white hover:text-indigo-600"
+                    >
+                      {previewExpanded ? (
+                        <>
+                          <Minimize2 size={12} />
+                          收起
+                        </>
+                      ) : (
+                        <>
+                          <Maximize2 size={12} />
+                          展开阅读
+                        </>
+                      )}
+                    </button>
+                  </>
+                )}
               </div>
             </div>
-            <div
-              className={`overflow-auto rounded-xl border border-gray-200/80 bg-white p-3 shadow-sm ${
-                previewExpanded ? 'min-h-0 flex-1' : 'max-h-72'
-              }`}
-            >
-              {renderPreview('panel')}
-            </div>
+            {!previewCollapsed && (
+              <div
+                className={`mt-2 overflow-auto rounded-xl border border-gray-200/80 bg-white p-3 shadow-sm ${
+                  previewExpanded ? 'min-h-0 flex-1' : 'max-h-72'
+                }`}
+              >
+                {renderPreview('panel')}
+              </div>
+            )}
           </div>
         ) : null}
 
-        <div className={`min-h-0 flex-1 overflow-y-auto bg-[linear-gradient(to_bottom,#f8fafc_0%,#ffffff_120px)] px-5 py-4 ${previewExpanded && selectedDocument ? 'hidden' : ''}`}>
+        <div className={`min-h-0 flex-1 overflow-y-auto bg-[linear-gradient(to_bottom,#f8fafc_0%,#ffffff_120px)] px-5 py-4 ${previewExpanded && selectedDocument && !previewCollapsed ? 'hidden' : ''}`}>
           {!collectionId ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50">

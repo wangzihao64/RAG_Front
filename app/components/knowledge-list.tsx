@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { FileText, Loader2, Plus, Trash2, Upload, X } from 'lucide-react';
+import { ChevronLeft, FileText, Loader2, Plus, Trash2, Upload, X } from 'lucide-react';
 import { buildAuthHeaders } from '../lib/auth';
 
 interface DocumentItem {
@@ -38,6 +38,7 @@ interface KnowledgeListProps {
   selectedDocumentId: number | null;
   onSelectDocument: (document: SelectedDocument | null) => void;
   onDeleteDocument?: (id: number) => void;
+  onCollapse?: () => void;
 }
 
 function formatFileSize(size?: number) {
@@ -60,6 +61,7 @@ export default function KnowledgeList({
   selectedDocumentId,
   onSelectDocument,
   onDeleteDocument,
+  onCollapse,
 }: KnowledgeListProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
@@ -214,15 +216,25 @@ export default function KnowledgeList({
             ) : null}
           </h2>
         </div>
-        <button
-          type="button"
-          className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-40"
-          aria-label="新增内容"
-          disabled={!collectionId}
-          onClick={openUploadModal}
-        >
-          <Plus size={16} />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+            aria-label="折叠文档列表"
+            onClick={() => onCollapse?.()}
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <button
+            type="button"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-40"
+            aria-label="新增内容"
+            disabled={!collectionId}
+            onClick={openUploadModal}
+          >
+            <Plus size={16} />
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-3">

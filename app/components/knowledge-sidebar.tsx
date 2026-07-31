@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FolderOpen, Globe, Loader2, Plus, Trash2, X } from 'lucide-react';
+import { ChevronLeft, FolderOpen, Globe, Loader2, Plus, Trash2, X } from 'lucide-react';
 import { buildAuthHeaders } from '../lib/auth';
 
 interface CollectionItem {
@@ -23,12 +23,14 @@ interface KnowledgeSidebarProps {
   selectedCollectionId: number | null;
   onSelectCollection: (id: number) => void;
   onDeleteCollection?: (id: number) => void;
+  onCollapse?: () => void;
 }
 
 export default function KnowledgeSidebar({
   selectedCollectionId,
   onSelectCollection,
   onDeleteCollection,
+  onCollapse,
 }: KnowledgeSidebarProps) {
   const [collections, setCollections] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -163,14 +165,24 @@ export default function KnowledgeSidebar({
           <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Library</p>
           <h2 className="text-sm font-semibold text-gray-900">个人知识库</h2>
         </div>
-        <button
-          type="button"
-          className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-sm transition hover:bg-indigo-700"
-          aria-label="新增知识库"
-          onClick={() => setIsModalOpen(true)}
-        >
-          <Plus size={16} />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-white hover:text-gray-600"
+            aria-label="折叠知识库"
+            onClick={() => onCollapse?.()}
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <button
+            type="button"
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-sm transition hover:bg-indigo-700"
+            aria-label="新增知识库"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Plus size={16} />
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-3">
