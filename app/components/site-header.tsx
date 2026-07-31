@@ -11,7 +11,7 @@ const navLinks = [
   { href: '#contact', label: '联系我们' },
 ];
 
-export function SiteHeader() {
+export function SiteHeader({ hideNavLinks = false }: { hideNavLinks?: boolean } = {}) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -71,23 +71,26 @@ export function SiteHeader() {
         </a>
 
         <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
+          {!hideNavLinks &&
+            navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
+          {!hideNavLinks && (
             <a
-              key={link.href}
-              href={link.href}
-              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              href="#"
+              onClick={handleKnowledgeClick}
+              className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-indigo-600 transition-colors"
             >
-              {link.label}
+              <Library size={14} />
+              知识库
             </a>
-          ))}
-          <a
-            href="#"
-            onClick={handleKnowledgeClick}
-            className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-indigo-600 transition-colors"
-          >
-            <Library size={14} />
-            知识库
-          </a>
+          )}
 
           {isAuthenticated ? (
             <div className="relative">
@@ -149,27 +152,30 @@ export function SiteHeader() {
 
       {menuOpen && (
         <nav className="md:hidden border-t border-gray-100 px-4 py-4 space-y-1 bg-white">
-          {navLinks.map((link) => (
+          {!hideNavLinks &&
+            navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="block py-2.5 text-gray-700 hover:text-gray-900"
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </a>
+            ))}
+          {!hideNavLinks && (
             <a
-              key={link.href}
-              href={link.href}
-              className="block py-2.5 text-gray-700 hover:text-gray-900"
-              onClick={() => setMenuOpen(false)}
+              href="#"
+              className="flex items-center gap-2 py-2.5 text-gray-700 hover:text-indigo-600"
+              onClick={(event) => {
+                setMenuOpen(false);
+                handleKnowledgeClick(event);
+              }}
             >
-              {link.label}
+              <Library size={14} />
+              知识库
             </a>
-          ))}
-          <a
-            href="#"
-            className="flex items-center gap-2 py-2.5 text-gray-700 hover:text-indigo-600"
-            onClick={(event) => {
-              setMenuOpen(false);
-              handleKnowledgeClick(event);
-            }}
-          >
-            <Library size={14} />
-            知识库
-          </a>
+          )}
           {isAuthenticated ? (
             <div className="pt-3 flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm text-gray-700">

@@ -1,5 +1,4 @@
 import { RagDemoChat } from './components/rag-demo-chat';
-import { AuthRedirect } from './components/auth-redirect';
 import { SiteHeader } from './components/site-header';
 import {
   ArrowRight,
@@ -65,7 +64,6 @@ const faqs = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
-      <AuthRedirect />
       <SiteHeader />
 
       <main>
