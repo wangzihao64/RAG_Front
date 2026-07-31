@@ -69,7 +69,7 @@ export default function Home() {
 
       <main>
         {/* Hero */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-8 pt-16 pb-20 sm:pt-24 sm:pb-28 text-center">
+        <section className="max-w-7xl mx-auto px-4 sm:px-8 pt-16 pb-8 sm:pt-24 sm:pb-12 text-center">
           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full mb-6">
             <Sparkles className="w-3.5 h-3.5" />
             基于 RAG 的智能知识库
@@ -100,7 +100,7 @@ export default function Home() {
         </section>
 
         {/* Use case */}
-        <section id="use-case" className="max-w-7xl mx-auto px-4 sm:px-8 py-20 sm:py-28">
+        <section id="use-case" className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 pb-20 sm:pt-8 sm:pb-28">
           <div className="text-center mb-14">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
               看看 AMemoryI 如何工作
