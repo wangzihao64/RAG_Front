@@ -24,3 +24,29 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     },
   });
 }
+
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const authorization = request.headers.get('authorization');
+  const { id } = await params;
+
+  if (!id) {
+    return NextResponse.json({ code: 400, msg: '非法的 id' }, { status: 400 });
+  }
+
+  const formData = await request.formData();
+
+  const upstreamResponse = await fetch(`${BACKEND_BASE_URL}/api/v1/collections/${encodeURIComponent(id)}/documents`, {
+    method: 'POST',
+    headers: authorization ? { Authorization: authorization } : {},
+    body: formData,
+  });
+
+  const text = await upstreamResponse.text();
+
+  return new NextResponse(text, {
+    status: upstreamResponse.status,
+    headers: {
+      'content-type': upstreamResponse.headers.get('content-type') || 'application/json',
+    },
+  });
+}
