@@ -181,7 +181,7 @@ export default function Home() {
               免费注册，上传你的第一份文档，立即体验 RAG 智能问答
             </p>
             <a
-              href="/"
+              href="/knowledge"
               className="inline-flex items-center gap-2 bg-white text-gray-900 px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors"
             >
               立即开始
