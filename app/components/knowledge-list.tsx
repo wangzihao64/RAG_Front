@@ -27,14 +27,24 @@ interface UploadDocumentResponse {
   contexts: unknown;
 }
 
-interface KnowledgeListProps {
-  collectionId: number | null;
+interface SelectedDocument {
+  id: number;
+  name: string;
 }
 
-export default function KnowledgeList({ collectionId }: KnowledgeListProps) {
+interface KnowledgeListProps {
+  collectionId: number | null;
+  selectedDocumentId: number | null;
+  onSelectDocument: (document: SelectedDocument | null) => void;
+}
+
+export default function KnowledgeList({
+  collectionId,
+  selectedDocumentId,
+  onSelectDocument,
+}: KnowledgeListProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
-  const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,7 +55,7 @@ export default function KnowledgeList({ collectionId }: KnowledgeListProps) {
   useEffect(() => {
     if (!collectionId) {
       setDocuments([]);
-      setSelectedDocumentId(null);
+      onSelectDocument(null);
       return;
     }
 
@@ -74,7 +84,7 @@ export default function KnowledgeList({ collectionId }: KnowledgeListProps) {
     };
 
     void loadDocuments();
-  }, [collectionId]);
+  }, [collectionId, onSelectDocument]);
 
   function openUploadModal() {
     if (!collectionId) return;
@@ -129,7 +139,7 @@ export default function KnowledgeList({ collectionId }: KnowledgeListProps) {
         }
         return [...prev, uploadedDocument];
       });
-      setSelectedDocumentId(uploadedDocument.id);
+      onSelectDocument({ id: uploadedDocument.id, name: uploadedDocument.name });
       closeUploadModal();
     } catch (error) {
       setUploadError(error instanceof Error ? error.message : '上传文档失败');
@@ -172,7 +182,7 @@ export default function KnowledgeList({ collectionId }: KnowledgeListProps) {
                   <li key={doc.id}>
                     <button
                       type="button"
-                      onClick={() => setSelectedDocumentId(doc.id)}
+                      onClick={() => onSelectDocument({ id: doc.id, name: doc.name })}
                       className={`w-full rounded-lg px-3 py-2 text-left text-sm shadow-sm transition ${
                         isSelected
                           ? 'border border-indigo-500 bg-indigo-50 text-indigo-900'

@@ -17,9 +17,14 @@ export default function KnowledgePage() {
   const [middleWidth, setMiddleWidth] = useState(420);
   const [resizeTarget, setResizeTarget] = useState<ResizeTarget>(null);
   const [selectedCollectionId, setSelectedCollectionId] = useState<number | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<{ id: number; name: string } | null>(null);
   const [dragStartX, setDragStartX] = useState(0);
   const [dragStartLeftWidth, setDragStartLeftWidth] = useState(240);
   const [dragStartMiddleWidth, setDragStartMiddleWidth] = useState(420);
+
+  useEffect(() => {
+    setSelectedDocument(null);
+  }, [selectedCollectionId]);
 
   useEffect(() => {
     const updateWidth = () => {
@@ -104,7 +109,11 @@ export default function KnowledgePage() {
           />
 
           <div className="min-h-[420px] px-2" style={{ width: middleWidth }}>
-            <KnowledgeList collectionId={selectedCollectionId} />
+            <KnowledgeList
+              collectionId={selectedCollectionId}
+              selectedDocumentId={selectedDocument?.id ?? null}
+              onSelectDocument={setSelectedDocument}
+            />
           </div>
 
           <div
@@ -113,7 +122,7 @@ export default function KnowledgePage() {
           />
 
           <div className="min-h-[420px] flex-1 px-2">
-            <KnowledgeDetail />
+            <KnowledgeDetail selectedDocument={selectedDocument} />
           </div>
         </div>
       </main>
