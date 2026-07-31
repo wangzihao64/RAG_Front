@@ -1,6 +1,6 @@
 schema_version: 1
 module_path: pages
-title: AMemoryI 着陆页（Next.js App Router 根页面）
+title: AMemoryI 着陆页（Next.js App Router 根路由）
 scope:
     - app/page.tsx
     - app/layout.tsx

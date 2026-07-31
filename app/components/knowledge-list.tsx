@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { FileText, Loader2, Plus, Upload, X } from 'lucide-react';
+import { FileText, Loader2, Plus, Trash2, Upload, X } from 'lucide-react';
 import { buildAuthHeaders } from '../lib/auth';
 
 interface DocumentItem {
@@ -37,6 +37,7 @@ interface KnowledgeListProps {
   collectionId: number | null;
   selectedDocumentId: number | null;
   onSelectDocument: (document: SelectedDocument | null) => void;
+  onDeleteDocument?: (id: number) => void;
 }
 
 function formatFileSize(size?: number) {
@@ -58,6 +59,7 @@ export default function KnowledgeList({
   collectionId,
   selectedDocumentId,
   onSelectDocument,
+  onDeleteDocument,
 }: KnowledgeListProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
@@ -67,6 +69,9 @@ export default function KnowledgeList({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<DocumentItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
     if (!collectionId) {
@@ -161,6 +166,39 @@ export default function KnowledgeList({
       setUploadError(error instanceof Error ? error.message : '上传文档失败');
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handleDeleteDocument() {
+    if (!deleteTarget) return;
+
+    setDeleting(true);
+    setDeleteError('');
+
+    try {
+      const response = await fetch(`/api/documents/${deleteTarget.id}`, {
+        method: 'DELETE',
+        headers: buildAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || '删除文档失败');
+      }
+
+      if (deleteTarget.id === selectedDocumentId) {
+        onSelectDocument(null);
+        onDeleteDocument?.(deleteTarget.id);
+      }
+
+      setDocuments((prev) => prev.filter((doc) => doc.id !== deleteTarget.id));
+      setDeleteTarget(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '删除文档失败';
+      setDeleteError(message);
+      console.error(error);
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -264,6 +302,18 @@ export default function KnowledgeList({
                           ) : null}
                         </div>
                       </div>
+                      <button
+                        type="button"
+                        className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-gray-300 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
+                        aria-label={`删除${doc.name}`}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setDeleteError('');
+                          setDeleteTarget(doc);
+                        }}
+                      >
+                        <Trash2 size={13} />
+                      </button>
                     </div>
                   </button>
                 </li>
@@ -272,6 +322,50 @@ export default function KnowledgeList({
           </ul>
         )}
       </div>
+
+      {deleteTarget ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl border border-gray-200/80 bg-white p-6 shadow-2xl">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50">
+                <Trash2 size={18} className="text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-gray-900">删除文档</h3>
+                <p className="text-sm text-gray-500">删除后无法恢复，确定要删除吗？</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 rounded-xl border border-gray-100 bg-gray-50/60 px-3.5 py-2.5 text-sm font-medium text-gray-800">
+              <FileText size={16} className="shrink-0 text-gray-400" />
+              <span className="truncate">{deleteTarget.name}</span>
+            </div>
+
+            {deleteError ? (
+              <div className="mt-3 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">{deleteError}</div>
+            ) : null}
+
+            <div className="mt-5 flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                disabled={deleting}
+                onClick={() => setDeleteTarget(null)}
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                className="rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={deleting}
+                onClick={handleDeleteDocument}
+              >
+                {deleting ? '删除中...' : '确认删除'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {isModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm">

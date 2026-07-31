@@ -1,6 +1,6 @@
 schema_version: 1
 module_path: ""
-title: AMemoryI RAG 知识库着陆页（Next.js 根项目）
+title: AMemoryI 着陆页根项目
 scope:
     - README.md
     - AGENTS.md
