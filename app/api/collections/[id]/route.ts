@@ -27,3 +27,36 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     },
   });
 }
+
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const authorization = request.headers.get('authorization');
+  const contentType = request.headers.get('content-type') || 'application/json';
+  const { id } = await params;
+
+  if (!id) {
+    return NextResponse.json({ code: 400, msg: '非法的 id' }, { status: 400 });
+  }
+
+  const body = await request.text();
+
+  const upstreamResponse = await fetch(
+    `${BACKEND_BASE_URL}/api/v1/collections/${encodeURIComponent(id)}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': contentType,
+        ...(authorization ? { Authorization: authorization } : {}),
+      },
+      body,
+    },
+  );
+
+  const text = await upstreamResponse.text();
+
+  return new NextResponse(text, {
+    status: upstreamResponse.status,
+    headers: {
+      'content-type': upstreamResponse.headers.get('content-type') || 'application/json',
+    },
+  });
+}

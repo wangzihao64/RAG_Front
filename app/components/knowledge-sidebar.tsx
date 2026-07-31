@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ChevronDown, ChevronLeft, ChevronUp, FolderOpen, Globe, Loader2, Plus, Trash2, X } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronUp, FolderOpen, Globe, Loader2, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { buildAuthHeaders } from '../lib/auth';
 
 interface CollectionItem {
@@ -44,6 +44,12 @@ export default function KnowledgeSidebar({
   const [deleteTarget, setDeleteTarget] = useState<CollectionItem | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  const [editTarget, setEditTarget] = useState<CollectionItem | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editIsPublic, setEditIsPublic] = useState(true);
+  const [editSubmitting, setEditSubmitting] = useState(false);
+  const [editError, setEditError] = useState('');
 
   async function loadCollections() {
     try {
@@ -156,6 +162,53 @@ export default function KnowledgeSidebar({
       console.error(error);
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  function openEditModal(item: CollectionItem) {
+    setEditTarget(item);
+    setEditName(item.name);
+    setEditDescription(item.description || '');
+    setEditIsPublic(item.is_public);
+    setEditError('');
+  }
+
+  async function handleEditCollection() {
+    if (!editTarget || !editName.trim()) return;
+
+    setEditSubmitting(true);
+    setEditError('');
+
+    try {
+      const headers = new Headers({
+        'Content-Type': 'application/json',
+      });
+      const authHeaders = buildAuthHeaders();
+      authHeaders.forEach((value, key) => headers.set(key, value));
+
+      const response = await fetch(`/api/collections/${editTarget.id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          name: editName.trim(),
+          description: editDescription.trim(),
+          is_public: editIsPublic,
+        }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || '编辑知识库失败');
+      }
+
+      setEditTarget(null);
+      await loadCollections();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '编辑知识库失败';
+      setEditError(message);
+      console.error(error);
+    } finally {
+      setEditSubmitting(false);
     }
   }
 
@@ -279,18 +332,31 @@ export default function KnowledgeSidebar({
                         {item.description || '暂无描述'}
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-gray-300 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
-                      aria-label={`删除${item.name}`}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setDeleteError('');
-                        setDeleteTarget(item);
-                      }}
-                    >
-                      <Trash2 size={13} />
-                    </button>
+                    <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition group-hover:opacity-100">
+                      <button
+                        type="button"
+                        className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-md text-gray-300 transition hover:bg-indigo-50 hover:text-indigo-500"
+                        aria-label={`编辑${item.name}`}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          openEditModal(item);
+                        }}
+                      >
+                        <Pencil size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-md text-gray-300 transition hover:bg-red-50 hover:text-red-500"
+                        aria-label={`删除${item.name}`}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setDeleteError('');
+                          setDeleteTarget(item);
+                        }}
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -404,6 +470,72 @@ export default function KnowledgeSidebar({
               className="mt-5 w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting ? '创建中...' : '创建知识库'}
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {editTarget ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-gray-200/80 bg-white p-6 shadow-2xl">
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Edit</p>
+                <h3 className="text-lg font-semibold text-gray-900">编辑知识库</h3>
+              </div>
+              <button
+                type="button"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+                onClick={() => setEditTarget(null)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <label className="block text-sm text-gray-700">
+                <span className="mb-1.5 block font-medium">知识库名称</span>
+                <input
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:border-indigo-300 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                  value={editName}
+                  onChange={(event) => setEditName(event.target.value)}
+                  placeholder="请输入知识库名称"
+                />
+              </label>
+
+              <label className="block text-sm text-gray-700">
+                <span className="mb-1.5 block font-medium">知识库描述</span>
+                <textarea
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:border-indigo-300 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                  value={editDescription}
+                  onChange={(event) => setEditDescription(event.target.value)}
+                  placeholder="请输入知识库描述"
+                  rows={3}
+                />
+              </label>
+
+              <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-100 bg-gray-50/50 px-3.5 py-3 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  checked={editIsPublic}
+                  onChange={(event) => setEditIsPublic(event.target.checked)}
+                />
+                是否公开
+              </label>
+            </div>
+
+            {editError ? (
+              <div className="mt-4 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">{editError}</div>
+            ) : null}
+
+            <button
+              type="button"
+              onClick={handleEditCollection}
+              disabled={editSubmitting || !editName.trim()}
+              className="mt-5 w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {editSubmitting ? '保存中...' : '保存修改'}
             </button>
           </div>
         </div>
