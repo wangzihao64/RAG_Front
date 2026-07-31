@@ -259,10 +259,17 @@ export default function KnowledgeList({
 
               return (
                 <li key={doc.id}>
-                  <button
-                    type="button"
+                  <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => onSelectDocument({ id: doc.id, name: doc.name })}
-                    className={`group w-full rounded-xl border px-3 py-2.5 text-left transition ${
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        onSelectDocument({ id: doc.id, name: doc.name });
+                      }
+                    }}
+                    className={`group w-full cursor-pointer rounded-xl border px-3 py-2.5 text-left transition ${
                       isSelected
                         ? 'border-indigo-200 bg-indigo-50 shadow-sm shadow-indigo-100/50'
                         : 'border-transparent hover:border-gray-200 hover:bg-gray-50'
@@ -315,7 +322,7 @@ export default function KnowledgeList({
                         <Trash2 size={13} />
                       </button>
                     </div>
-                  </button>
+                  </div>
                 </li>
               );
             })}

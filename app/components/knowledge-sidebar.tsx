@@ -191,11 +191,18 @@ export default function KnowledgeSidebar({
               const isSelected = item.id === selectedCollectionId;
 
               return (
-                <button
+                <div
                   key={item.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => onSelectCollection(item.id)}
-                  className={`group w-full rounded-xl border px-3 py-2.5 text-left transition ${
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      onSelectCollection(item.id);
+                    }
+                  }}
+                  className={`group w-full cursor-pointer rounded-xl border px-3 py-2.5 text-left transition ${
                     isSelected
                       ? 'border-indigo-200 bg-indigo-50 shadow-sm shadow-indigo-100/50'
                       : 'border-transparent bg-white hover:border-gray-200 hover:shadow-sm'
@@ -245,7 +252,7 @@ export default function KnowledgeSidebar({
                       <Trash2 size={13} />
                     </button>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
