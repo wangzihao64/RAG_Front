@@ -395,22 +395,26 @@ export default function KnowledgeList({
               <label className="block">
                 <span className="mb-1.5 block text-sm font-medium text-gray-700">选择文件</span>
                 <div className="rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 px-4 py-6 text-center transition hover:border-indigo-200 hover:bg-indigo-50/30">
-                  <Upload size={24} className="mx-auto mb-2 text-gray-400" />
+                  <Upload size={24} className="mx-auto mb-3 text-gray-400" />
                   <input
                     ref={fileInputRef}
+                    id="file-upload-input"
                     type="file"
-                    className="mx-auto block max-w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-indigo-600 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-indigo-700"
+                    className="sr-only"
                     onChange={handleFileChange}
                   />
+                  <label
+                    htmlFor="file-upload-input"
+                    className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
+                  >
+                    <Upload size={14} />
+                    选择文件
+                  </label>
+                  <p className="mt-2 text-xs text-gray-400">
+                    {selectedFile ? selectedFile.name : '支持 PDF、Word、Markdown 等格式'}
+                  </p>
                 </div>
               </label>
-
-              {selectedFile ? (
-                <div className="flex items-center gap-2 rounded-xl border border-indigo-100 bg-indigo-50/50 px-3.5 py-2.5 text-sm text-indigo-900">
-                  <FileText size={16} className="shrink-0 text-indigo-500" />
-                  <span className="truncate">{selectedFile.name}</span>
-                </div>
-              ) : null}
             </div>
 
             {uploadError ? (
