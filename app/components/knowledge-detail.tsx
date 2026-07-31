@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { BookOpen, FileText, Loader2, MessageSquare, Send, Sparkles } from 'lucide-react';
+import { BookOpen, FileText, Loader2, Maximize2, MessageSquare, Minimize2, Send, Sparkles } from 'lucide-react';
 import { buildAuthHeaders } from '../lib/auth';
 
 export interface SelectedDocument {
@@ -112,11 +112,16 @@ export default function KnowledgeDetail({ collectionId, selectedDocument }: Know
   const [contentError, setContentError] = useState('');
   const [sending, setSending] = useState(false);
   const [chatError, setChatError] = useState('');
+  const [previewExpanded, setPreviewExpanded] = useState(false);
 
   useEffect(() => {
     setChatMessages([]);
     setChatError('');
   }, [collectionId]);
+
+  useEffect(() => {
+    setPreviewExpanded(false);
+  }, [selectedDocument?.id]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -343,9 +348,36 @@ export default function KnowledgeDetail({ collectionId, selectedDocument }: Know
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         {selectedDocument ? (
-          <div className="shrink-0 border-b border-gray-100 bg-slate-50/60 px-5 py-3">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Preview</p>
-            <div className="max-h-36 overflow-auto rounded-xl border border-gray-200/80 bg-white p-3 shadow-sm">
+          <div
+            className={`border-b border-gray-100 bg-slate-50/60 px-5 py-3 ${
+              previewExpanded ? 'flex min-h-0 flex-1 flex-col' : 'shrink-0'
+            }`}
+          >
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Preview</p>
+              <button
+                type="button"
+                onClick={() => setPreviewExpanded((prev) => !prev)}
+                className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-gray-500 transition hover:bg-white hover:text-indigo-600"
+              >
+                {previewExpanded ? (
+                  <>
+                    <Minimize2 size={12} />
+                    收起
+                  </>
+                ) : (
+                  <>
+                    <Maximize2 size={12} />
+                    展开阅读
+                  </>
+                )}
+              </button>
+            </div>
+            <div
+              className={`overflow-auto rounded-xl border border-gray-200/80 bg-white p-3 shadow-sm ${
+                previewExpanded ? 'min-h-0 flex-1' : 'max-h-72'
+              }`}
+            >
               {loading ? (
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <Loader2 size={14} className="animate-spin" />
@@ -354,20 +386,21 @@ export default function KnowledgeDetail({ collectionId, selectedDocument }: Know
               ) : contentError ? (
                 <div className="text-sm text-red-600">{contentError}</div>
               ) : content?.kind === 'text' ? (
-                <pre className="whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-gray-700">
+                <pre className="whitespace-pre-wrap break-words font-mono text-sm leading-relaxed text-gray-700">
                   {content.data}
                 </pre>
               ) : content?.kind === 'image' ? (
                 <img
                   src={content.data}
                   alt={selectedDocument.name}
-                  className="max-h-28 max-w-full rounded-lg object-contain"
+                  className="mx-auto max-h-full max-w-full rounded-lg object-contain"
                 />
               ) : content?.kind === 'pdf' ? (
-                <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <FileText size={14} />
-                  PDF 文档：{selectedDocument.name}
-                </div>
+                <iframe
+                  src={content.data}
+                  title={selectedDocument.name}
+                  className={`w-full rounded-lg ${previewExpanded ? 'h-full' : 'h-64'}`}
+                />
               ) : content?.kind === 'unsupported' ? (
                 <div className="flex items-center justify-between gap-3 text-xs text-gray-500">
                   <span>暂不支持在线预览</span>
@@ -386,7 +419,7 @@ export default function KnowledgeDetail({ collectionId, selectedDocument }: Know
           </div>
         ) : null}
 
-        <div className="min-h-0 flex-1 overflow-y-auto bg-[linear-gradient(to_bottom,#f8fafc_0%,#ffffff_120px)] px-5 py-4">
+        <div className={`min-h-0 flex-1 overflow-y-auto bg-[linear-gradient(to_bottom,#f8fafc_0%,#ffffff_120px)] px-5 py-4 ${previewExpanded && selectedDocument ? 'hidden' : ''}`}>
           {!collectionId ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50">

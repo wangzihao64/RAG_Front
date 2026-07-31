@@ -1,0 +1,17 @@
+schema_version: 1
+module_path: ""
+title: RAG Front 前端应用（Next.js 着陆页）
+scope:
+    - README.md
+    - AGENTS.md
+    - CLAUDE.md
+    - .gitignore
+    - package.json
+    - package-lock.json
+    - next.config.ts
+    - tsconfig.json
+    - eslint.config.mjs
+    - postcss.config.mjs
+source_files: []
+depends_on: []
+related_to: []
