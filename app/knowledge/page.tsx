@@ -129,6 +129,10 @@ export default function KnowledgePage() {
             <KnowledgeSidebar
               selectedCollectionId={selectedCollectionId}
               onSelectCollection={setSelectedCollectionId}
+              onDeleteCollection={() => {
+                setSelectedCollectionId(null);
+                setSelectedDocument(null);
+              }}
             />
           </div>
 

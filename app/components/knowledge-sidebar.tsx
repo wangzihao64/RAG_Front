@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FolderOpen, Globe, Loader2, Plus, X } from 'lucide-react';
+import { FolderOpen, Globe, Loader2, Plus, Trash2, X } from 'lucide-react';
 import { buildAuthHeaders } from '../lib/auth';
 
 interface CollectionItem {
@@ -22,11 +22,13 @@ interface CollectionsResponse {
 interface KnowledgeSidebarProps {
   selectedCollectionId: number | null;
   onSelectCollection: (id: number) => void;
+  onDeleteCollection?: (id: number) => void;
 }
 
 export default function KnowledgeSidebar({
   selectedCollectionId,
   onSelectCollection,
+  onDeleteCollection,
 }: KnowledgeSidebarProps) {
   const [collections, setCollections] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +38,9 @@ export default function KnowledgeSidebar({
   const [isPublic, setIsPublic] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [createError, setCreateError] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<CollectionItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   async function loadCollections() {
     try {
@@ -76,6 +81,38 @@ export default function KnowledgeSidebar({
       isActive = false;
     };
   }, []);
+
+  async function handleDeleteCollection() {
+    if (!deleteTarget) return;
+
+    setDeleting(true);
+    setDeleteError('');
+
+    try {
+      const response = await fetch(`/api/collections/${deleteTarget.id}`, {
+        method: 'DELETE',
+        headers: buildAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || '删除知识库失败');
+      }
+
+      if (deleteTarget.id === selectedCollectionId) {
+        onDeleteCollection?.(deleteTarget.id);
+      }
+
+      setDeleteTarget(null);
+      await loadCollections();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '删除知识库失败';
+      setDeleteError(message);
+      console.error(error);
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   async function handleCreateCollection() {
     if (!name.trim()) return;
@@ -195,6 +232,18 @@ export default function KnowledgeSidebar({
                         {item.description || '暂无描述'}
                       </div>
                     </div>
+                    <button
+                      type="button"
+                      className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-gray-300 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
+                      aria-label={`删除${item.name}`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setDeleteError('');
+                        setDeleteTarget(item);
+                      }}
+                    >
+                      <Trash2 size={13} />
+                    </button>
                   </div>
                 </button>
               );
@@ -202,6 +251,49 @@ export default function KnowledgeSidebar({
           </div>
         )}
       </div>
+
+      {deleteTarget ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl border border-gray-200/80 bg-white p-6 shadow-2xl">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50">
+                <Trash2 size={18} className="text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-gray-900">删除知识库</h3>
+                <p className="text-sm text-gray-500">此操作不可撤销，其中的文档也会被一并删除</p>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-gray-100 bg-gray-50/60 px-3.5 py-2.5 text-sm font-medium text-gray-800">
+              {deleteTarget.name}
+            </div>
+
+            {deleteError ? (
+              <div className="mt-3 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">{deleteError}</div>
+            ) : null}
+
+            <div className="mt-5 flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                disabled={deleting}
+                onClick={() => setDeleteTarget(null)}
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                className="rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={deleting}
+                onClick={handleDeleteCollection}
+              >
+                {deleting ? '删除中...' : '确认删除'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {isModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm">
