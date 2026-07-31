@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { FileText, Loader2, Plus, Upload, X } from 'lucide-react';
 import { buildAuthHeaders } from '../lib/auth';
 
 interface DocumentItem {
@@ -36,6 +37,21 @@ interface KnowledgeListProps {
   collectionId: number | null;
   selectedDocumentId: number | null;
   onSelectDocument: (document: SelectedDocument | null) => void;
+}
+
+function formatFileSize(size?: number) {
+  if (!size) return null;
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function statusLabel(status?: string) {
+  if (!status) return null;
+  if (status === 'pending') return '处理中';
+  if (status === 'ready' || status === 'completed') return '就绪';
+  if (status === 'failed') return '失败';
+  return status;
 }
 
 export default function KnowledgeList({
@@ -149,105 +165,162 @@ export default function KnowledgeList({
   }
 
   return (
-    <div className="h-full rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-      <div className="flex items-center justify-between">
-        <div className="text-sm font-semibold text-gray-900">
-          内容 {collectionId ? `(${documents.length})` : ''}
+    <div className="flex h-full flex-col border-x border-gray-100 bg-white">
+      <div className="flex items-center justify-between border-b border-gray-100 px-4 py-4">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Documents</p>
+          <h2 className="text-sm font-semibold text-gray-900">
+            文档内容
+            {collectionId ? (
+              <span className="ml-1.5 text-xs font-normal text-gray-400">{documents.length}</span>
+            ) : null}
+          </h2>
         </div>
         <button
           type="button"
-          className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white text-lg text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-40"
           aria-label="新增内容"
           disabled={!collectionId}
           onClick={openUploadModal}
         >
-          +
+          <Plus size={16} />
         </button>
       </div>
 
-      <div className="mt-4 rounded-lg border border-gray-100 bg-gray-50 p-3 min-h-[72px]">
-        {collectionId ? (
-          loading ? (
-            <div className="text-sm text-gray-500">加载文档中...</div>
-          ) : error ? (
-            <div className="text-sm text-red-600">{error}</div>
-          ) : documents.length === 0 ? (
-            <div className="text-sm text-gray-500">当前知识库暂无文档</div>
-          ) : (
-            <ul className="space-y-2">
-              {documents.map((doc) => {
-                const isSelected = doc.id === selectedDocumentId;
-
-                return (
-                  <li key={doc.id}>
-                    <button
-                      type="button"
-                      onClick={() => onSelectDocument({ id: doc.id, name: doc.name })}
-                      className={`w-full rounded-lg px-3 py-2 text-left text-sm shadow-sm transition ${
-                        isSelected
-                          ? 'border border-indigo-500 bg-indigo-50 text-indigo-900'
-                          : 'border border-transparent bg-white text-gray-900 hover:border-gray-200'
-                      }`}
-                    >
-                      {doc.name}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          )
+      <div className="flex-1 overflow-y-auto p-3">
+        {!collectionId ? (
+          <div className="flex h-full min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50/50 px-4 py-10 text-center">
+            <FileText size={28} className="mb-2 text-gray-300" />
+            <p className="text-sm text-gray-500">请先从左侧选择一个知识库</p>
+          </div>
+        ) : loading ? (
+          <div className="flex items-center gap-2 px-2 py-6 text-sm text-gray-500">
+            <Loader2 size={16} className="animate-spin" />
+            加载文档中...
+          </div>
+        ) : error ? (
+          <div className="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-600">{error}</div>
+        ) : documents.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50/50 px-4 py-10 text-center">
+            <Upload size={28} className="mb-2 text-gray-300" />
+            <p className="text-sm text-gray-500">当前知识库暂无文档</p>
+            <button
+              type="button"
+              onClick={openUploadModal}
+              className="mt-3 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-700"
+            >
+              上传第一个文档
+            </button>
+          </div>
         ) : (
-          <div className="text-sm text-gray-500">请先从左侧选择一个知识库</div>
+          <ul className="space-y-1.5">
+            {documents.map((doc) => {
+              const isSelected = doc.id === selectedDocumentId;
+              const sizeLabel = formatFileSize(doc.file_size);
+              const status = statusLabel(doc.status);
+
+              return (
+                <li key={doc.id}>
+                  <button
+                    type="button"
+                    onClick={() => onSelectDocument({ id: doc.id, name: doc.name })}
+                    className={`group w-full rounded-xl border px-3 py-2.5 text-left transition ${
+                      isSelected
+                        ? 'border-indigo-200 bg-indigo-50 shadow-sm shadow-indigo-100/50'
+                        : 'border-transparent hover:border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-start gap-2.5">
+                      <div
+                        className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
+                          isSelected ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-500'
+                        }`}
+                      >
+                        <FileText size={14} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div
+                          className={`truncate text-sm font-medium ${
+                            isSelected ? 'text-indigo-900' : 'text-gray-800'
+                          }`}
+                        >
+                          {doc.name}
+                        </div>
+                        <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                          {doc.file_type ? (
+                            <span className="rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium uppercase text-gray-500">
+                              {doc.file_type}
+                            </span>
+                          ) : null}
+                          {sizeLabel ? <span className="text-[11px] text-gray-400">{sizeLabel}</span> : null}
+                          {status ? (
+                            <span
+                              className={`text-[11px] ${
+                                doc.status === 'failed' ? 'text-red-500' : 'text-gray-400'
+                              }`}
+                            >
+                              {status}
+                            </span>
+                          ) : null}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         )}
       </div>
 
-      {collectionId && documents.length > 0 ? (
-        <div className="mt-4 text-sm text-gray-500">如需查看文档内容，请在文档列表中选择具体文档。</div>
-      ) : null}
-
       {isModalOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-xl">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">上传文档</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-gray-200/80 bg-white p-6 shadow-2xl">
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Upload</p>
+                <h3 className="text-lg font-semibold text-gray-900">上传文档</h3>
+              </div>
               <button
                 type="button"
-                className="text-sm text-gray-500 hover:text-gray-700"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
                 onClick={closeUploadModal}
               >
-                关闭
+                <X size={18} />
               </button>
             </div>
 
-            <div className="space-y-3">
-              <label className="block text-sm text-gray-700">
-                <span className="mb-1 block">选择文件</span>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-sm file:text-gray-700"
-                  onChange={handleFileChange}
-                />
+            <div className="space-y-4">
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium text-gray-700">选择文件</span>
+                <div className="rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 px-4 py-6 text-center transition hover:border-indigo-200 hover:bg-indigo-50/30">
+                  <Upload size={24} className="mx-auto mb-2 text-gray-400" />
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="mx-auto block max-w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-indigo-600 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-indigo-700"
+                    onChange={handleFileChange}
+                  />
+                </div>
               </label>
 
               {selectedFile ? (
-                <div className="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700">
-                  已选择：{selectedFile.name}
+                <div className="flex items-center gap-2 rounded-xl border border-indigo-100 bg-indigo-50/50 px-3.5 py-2.5 text-sm text-indigo-900">
+                  <FileText size={16} className="shrink-0 text-indigo-500" />
+                  <span className="truncate">{selectedFile.name}</span>
                 </div>
               ) : null}
             </div>
 
             {uploadError ? (
-              <div className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
-                {uploadError}
-              </div>
+              <div className="mt-4 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">{uploadError}</div>
             ) : null}
 
             <button
               type="button"
               onClick={handleUploadDocument}
               disabled={uploading || !selectedFile}
-              className="mt-4 w-full rounded-full bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
+              className="mt-5 w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {uploading ? '上传中...' : '上传文档'}
             </button>

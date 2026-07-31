@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { FolderOpen, Globe, Loader2, Plus, X } from 'lucide-react';
 import { buildAuthHeaders } from '../lib/auth';
 
 interface CollectionItem {
@@ -119,71 +120,111 @@ export default function KnowledgeSidebar({
   }
 
   return (
-    <div className="h-full rounded-xl border border-gray-100 bg-gray-50/70 p-4">
-      <div className="flex items-center justify-between pt-1">
-        <div className="text-sm font-semibold text-gray-900">个人知识库</div>
+    <div className="flex h-full flex-col bg-gray-50/40">
+      <div className="flex items-center justify-between border-b border-gray-100 px-4 py-4">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Library</p>
+          <h2 className="text-sm font-semibold text-gray-900">个人知识库</h2>
+        </div>
         <button
           type="button"
-          className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white text-lg text-gray-700 transition hover:bg-gray-100"
+          className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-sm transition hover:bg-indigo-700"
           aria-label="新增知识库"
           onClick={() => setIsModalOpen(true)}
         >
-          +
+          <Plus size={16} />
         </button>
       </div>
 
-      <div className="mt-4 space-y-2">
+      <div className="flex-1 overflow-y-auto p-3">
         {loading ? (
-          <div className="text-sm text-gray-500">加载中...</div>
+          <div className="flex items-center gap-2 px-2 py-6 text-sm text-gray-500">
+            <Loader2 size={16} className="animate-spin" />
+            加载中...
+          </div>
         ) : collections.length === 0 ? (
-          <div className="text-sm text-gray-500">暂无知识库</div>
+          <div className="rounded-xl border border-dashed border-gray-200 bg-white px-4 py-8 text-center">
+            <FolderOpen size={28} className="mx-auto mb-2 text-gray-300" />
+            <p className="text-sm text-gray-500">暂无知识库</p>
+            <p className="mt-1 text-xs text-gray-400">点击右上角创建第一个知识库</p>
+          </div>
         ) : (
-          collections.map((item) => {
-            const isSelected = item.id === selectedCollectionId;
+          <div className="space-y-1.5">
+            {collections.map((item) => {
+              const isSelected = item.id === selectedCollectionId;
 
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => onSelectCollection(item.id)}
-                className={
-                  `group w-full text-left rounded-lg border px-3 py-2 text-sm transition ${
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => onSelectCollection(item.id)}
+                  className={`group w-full rounded-xl border px-3 py-2.5 text-left transition ${
                     isSelected
-                      ? 'border-indigo-500 bg-indigo-50 text-indigo-900'
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
-                  }`
-                }
-                title={item.description || '暂无描述'}
-              >
-                <div>{item.name}</div>
-                <div className="mt-1 text-xs text-gray-500 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                  {item.description || '暂无描述'}
-                </div>
-              </button>
-            );
-          })
+                      ? 'border-indigo-200 bg-indigo-50 shadow-sm shadow-indigo-100/50'
+                      : 'border-transparent bg-white hover:border-gray-200 hover:shadow-sm'
+                  }`}
+                  title={item.description || '暂无描述'}
+                >
+                  <div className="flex items-start gap-2.5">
+                    <div
+                      className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
+                        isSelected ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-500'
+                      }`}
+                    >
+                      <FolderOpen size={14} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div
+                        className={`truncate text-sm font-medium ${
+                          isSelected ? 'text-indigo-900' : 'text-gray-800'
+                        }`}
+                      >
+                        {item.name}
+                      </div>
+                      <div className="mt-0.5 flex items-center gap-1.5">
+                        {item.is_public ? (
+                          <span className="inline-flex items-center gap-0.5 text-[11px] text-gray-400">
+                            <Globe size={10} />
+                            公开
+                          </span>
+                        ) : (
+                          <span className="text-[11px] text-gray-400">私有</span>
+                        )}
+                      </div>
+                      <div className="mt-1 line-clamp-2 text-xs text-gray-400 opacity-0 transition-opacity group-hover:opacity-100">
+                        {item.description || '暂无描述'}
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         )}
       </div>
 
       {isModalOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-xl">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">创建知识库</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-gray-200/80 bg-white p-6 shadow-2xl">
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">New</p>
+                <h3 className="text-lg font-semibold text-gray-900">创建知识库</h3>
+              </div>
               <button
                 type="button"
-                className="text-sm text-gray-500 hover:text-gray-700"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
                 onClick={() => setIsModalOpen(false)}
               >
-                关闭
+                <X size={18} />
               </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <label className="block text-sm text-gray-700">
-                <span className="mb-1 block">知识库名称</span>
+                <span className="mb-1.5 block font-medium">知识库名称</span>
                 <input
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 outline-none"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:border-indigo-300 focus:bg-white focus:ring-2 focus:ring-indigo-100"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   placeholder="请输入知识库名称"
@@ -191,9 +232,9 @@ export default function KnowledgeSidebar({
               </label>
 
               <label className="block text-sm text-gray-700">
-                <span className="mb-1 block">知识库描述</span>
+                <span className="mb-1.5 block font-medium">知识库描述</span>
                 <textarea
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 outline-none"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:border-indigo-300 focus:bg-white focus:ring-2 focus:ring-indigo-100"
                   value={description}
                   onChange={(event) => setDescription(event.target.value)}
                   placeholder="请输入知识库描述"
@@ -201,9 +242,10 @@ export default function KnowledgeSidebar({
                 />
               </label>
 
-              <label className="flex items-center gap-2 text-sm text-gray-700">
+              <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-100 bg-gray-50/50 px-3.5 py-3 text-sm text-gray-700">
                 <input
                   type="checkbox"
+                  className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                   checked={isPublic}
                   onChange={(event) => setIsPublic(event.target.checked)}
                 />
@@ -212,16 +254,14 @@ export default function KnowledgeSidebar({
             </div>
 
             {createError ? (
-              <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
-                {createError}
-              </div>
+              <div className="mt-4 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">{createError}</div>
             ) : null}
 
             <button
               type="button"
               onClick={handleCreateCollection}
               disabled={submitting || !name.trim()}
-              className="mt-4 w-full rounded-full bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
+              className="mt-5 w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting ? '创建中...' : '创建知识库'}
             </button>
