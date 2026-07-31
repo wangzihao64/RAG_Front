@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, FileText, Loader2, Plus, Trash2, Upload, X } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronUp, FileText, Loader2, Plus, Trash2, Upload, X } from 'lucide-react';
 import { buildAuthHeaders } from '../lib/auth';
 
 interface DocumentItem {
@@ -67,6 +67,7 @@ export default function KnowledgeList({
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [listExpanded, setListExpanded] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -207,23 +208,49 @@ export default function KnowledgeList({
   return (
     <div className="flex h-full flex-col border-x border-gray-100 bg-white">
       <div className="flex items-center justify-between border-b border-gray-100 px-4 py-4">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Documents</p>
-          <h2 className="text-sm font-semibold text-gray-900">
-            文档内容
-            {collectionId ? (
-              <span className="ml-1.5 text-xs font-normal text-gray-400">{documents.length}</span>
-            ) : null}
-          </h2>
-        </div>
+        <button
+          type="button"
+          onClick={() => setListExpanded((prev) => !prev)}
+          className="flex items-center gap-2 text-left transition hover:opacity-70"
+        >
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Documents</p>
+            <h2 className="text-sm font-semibold text-gray-900">
+              文档内容
+              {collectionId ? (
+                <span className="ml-1.5 text-xs font-normal text-gray-400">{documents.length}</span>
+              ) : null}
+            </h2>
+          </div>
+          <span
+            className={`inline-flex items-center gap-0.5 rounded-full px-2.5 py-1 text-[11px] font-medium transition ${
+              listExpanded
+                ? 'bg-indigo-50 text-indigo-600'
+                : 'bg-gray-100 text-gray-500'
+            }`}
+          >
+            {listExpanded ? (
+              <>
+                <ChevronUp size={12} />
+                收起
+              </>
+            ) : (
+              <>
+                <ChevronDown size={12} />
+                展开
+              </>
+            )}
+          </span>
+        </button>
         <div className="flex items-center gap-1">
           <button
             type="button"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
-            aria-label="折叠文档列表"
+            className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-medium text-gray-500 transition hover:bg-gray-200 hover:text-gray-700"
+            aria-label="折叠面板"
             onClick={() => onCollapse?.()}
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={12} />
+            折叠
           </button>
           <button
             type="button"
@@ -237,6 +264,7 @@ export default function KnowledgeList({
         </div>
       </div>
 
+      {listExpanded && (
       <div className="flex-1 overflow-y-auto p-3">
         {!collectionId ? (
           <div className="flex h-full min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50/50 px-4 py-10 text-center">
@@ -341,6 +369,7 @@ export default function KnowledgeList({
           </ul>
         )}
       </div>
+      )}
 
       {deleteTarget ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm">

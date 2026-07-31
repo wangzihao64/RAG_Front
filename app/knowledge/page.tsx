@@ -134,18 +134,18 @@ export default function KnowledgePage() {
         >
           {sidebarCollapsed ? (
             <div
-              className="flex h-full shrink-0 flex-col items-center border-r border-gray-100 bg-gray-50/60 py-4"
+              className="flex h-full shrink-0 flex-col items-center gap-3 border-r border-gray-100 bg-gray-50/60 py-4"
               style={{ width: SIDEBAR_COLLAPSED_WIDTH }}
             >
               <button
                 type="button"
                 onClick={() => setSidebarCollapsed(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-white hover:text-indigo-600 hover:shadow-sm"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 transition hover:bg-indigo-200"
                 title="展开知识库"
               >
                 <ChevronRight size={16} />
               </button>
-              <div className="mt-3 flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50">
                 <BookOpen size={14} className="text-indigo-500" />
               </div>
             </div>
@@ -169,18 +169,18 @@ export default function KnowledgePage() {
 
           {listCollapsed ? (
             <div
-              className="flex h-full shrink-0 flex-col items-center border-r border-gray-100 bg-gray-50/60 py-4"
+              className="flex h-full shrink-0 flex-col items-center gap-3 border-r border-gray-100 bg-gray-50/60 py-4"
               style={{ width: LIST_COLLAPSED_WIDTH }}
             >
               <button
                 type="button"
                 onClick={() => setListCollapsed(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-white hover:text-indigo-600 hover:shadow-sm"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 transition hover:bg-indigo-200"
                 title="展开文档列表"
               >
                 <ChevronRight size={16} />
               </button>
-              <div className="mt-3 flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50">
                 <FileText size={14} className="text-indigo-500" />
               </div>
             </div>

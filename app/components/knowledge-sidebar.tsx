@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ChevronLeft, FolderOpen, Globe, Loader2, Plus, Trash2, X } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronUp, FolderOpen, Globe, Loader2, Plus, Trash2, X } from 'lucide-react';
 import { buildAuthHeaders } from '../lib/auth';
 
 interface CollectionItem {
@@ -34,6 +34,7 @@ export default function KnowledgeSidebar({
 }: KnowledgeSidebarProps) {
   const [collections, setCollections] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [listExpanded, setListExpanded] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -161,18 +162,44 @@ export default function KnowledgeSidebar({
   return (
     <div className="flex h-full flex-col bg-gray-50/40">
       <div className="flex items-center justify-between border-b border-gray-100 px-4 py-4">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Library</p>
-          <h2 className="text-sm font-semibold text-gray-900">个人知识库</h2>
-        </div>
+        <button
+          type="button"
+          onClick={() => setListExpanded((prev) => !prev)}
+          className="flex items-center gap-2 text-left transition hover:opacity-70"
+        >
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Library</p>
+            <h2 className="text-sm font-semibold text-gray-900">个人知识库</h2>
+          </div>
+          <span
+            className={`inline-flex items-center gap-0.5 rounded-full px-2.5 py-1 text-[11px] font-medium transition ${
+              listExpanded
+                ? 'bg-indigo-50 text-indigo-600'
+                : 'bg-gray-100 text-gray-500'
+            }`}
+          >
+            {listExpanded ? (
+              <>
+                <ChevronUp size={12} />
+                收起
+              </>
+            ) : (
+              <>
+                <ChevronDown size={12} />
+                展开
+              </>
+            )}
+          </span>
+        </button>
         <div className="flex items-center gap-1">
           <button
             type="button"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-white hover:text-gray-600"
-            aria-label="折叠知识库"
+            className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-medium text-gray-500 transition hover:bg-gray-200 hover:text-gray-700"
+            aria-label="折叠面板"
             onClick={() => onCollapse?.()}
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={12} />
+            折叠
           </button>
           <button
             type="button"
@@ -185,7 +212,8 @@ export default function KnowledgeSidebar({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3">
+      {listExpanded && (
+        <div className="flex-1 overflow-y-auto p-3">
         {loading ? (
           <div className="flex items-center gap-2 px-2 py-6 text-sm text-gray-500">
             <Loader2 size={16} className="animate-spin" />
@@ -270,6 +298,7 @@ export default function KnowledgeSidebar({
           </div>
         )}
       </div>
+      )}
 
       {deleteTarget ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm">

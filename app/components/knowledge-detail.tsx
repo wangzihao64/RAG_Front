@@ -426,7 +426,11 @@ export default function KnowledgeDetail({ collectionId, selectedDocument, previe
                 <button
                   type="button"
                   onClick={() => onTogglePreview?.()}
-                  className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-gray-500 transition hover:bg-white hover:text-indigo-600"
+                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition ${
+                    previewCollapsed
+                      ? 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
+                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
+                  }`}
                   title={previewCollapsed ? '展开文档内容' : '折叠文档内容'}
                 >
                   {previewCollapsed ? (
