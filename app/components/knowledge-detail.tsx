@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { BookOpen, FileText, Loader2, Maximize2, MessageSquare, Minimize2, Send, Sparkles } from 'lucide-react';
+import { BookOpen, ExternalLink, FileText, Loader2, Maximize2, MessageSquare, Minimize2, Send, Sparkles, X } from 'lucide-react';
 import { buildAuthHeaders } from '../lib/auth';
 
 export interface SelectedDocument {
@@ -113,6 +113,7 @@ export default function KnowledgeDetail({ collectionId, selectedDocument }: Know
   const [sending, setSending] = useState(false);
   const [chatError, setChatError] = useState('');
   const [previewExpanded, setPreviewExpanded] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     setChatMessages([]);
@@ -121,11 +122,21 @@ export default function KnowledgeDetail({ collectionId, selectedDocument }: Know
 
   useEffect(() => {
     setPreviewExpanded(false);
+    setModalOpen(false);
   }, [selectedDocument?.id]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
+
+  useEffect(() => {
+    if (!modalOpen) return;
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setModalOpen(false);
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [modalOpen]);
 
   useEffect(() => {
     if (!selectedDocument) {
@@ -330,6 +341,60 @@ export default function KnowledgeDetail({ collectionId, selectedDocument }: Know
     }
   }
 
+  function renderPreview(mode: 'panel' | 'modal') {
+    if (loading) {
+      return (
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <Loader2 size={14} className="animate-spin" />
+          加载文档内容中...
+        </div>
+      );
+    }
+    if (contentError) {
+      return <div className="text-sm text-red-600">{contentError}</div>;
+    }
+    if (content?.kind === 'text') {
+      return (
+        <pre className="whitespace-pre-wrap break-words font-mono text-sm leading-relaxed text-gray-700">
+          {content.data}
+        </pre>
+      );
+    }
+    if (content?.kind === 'image') {
+      return (
+        <img
+          src={content.data}
+          alt={selectedDocument?.name ?? ''}
+          className="mx-auto max-h-full max-w-full rounded-lg object-contain"
+        />
+      );
+    }
+    if (content?.kind === 'pdf') {
+      return (
+        <iframe
+          src={content.data}
+          title={selectedDocument?.name ?? ''}
+          className={`w-full rounded-lg ${mode === 'modal' ? 'h-full' : previewExpanded ? 'h-full' : 'h-64'}`}
+        />
+      );
+    }
+    if (content?.kind === 'unsupported') {
+      return (
+        <div className="flex items-center justify-between gap-3 text-xs text-gray-500">
+          <span>暂不支持在线预览</span>
+          <a
+            href={content.data}
+            download={selectedDocument?.name ?? ''}
+            className="rounded-lg bg-indigo-600 px-2.5 py-1 text-white transition hover:bg-indigo-700"
+          >
+            下载
+          </a>
+        </div>
+      );
+    }
+    return <div className="text-sm text-gray-500">暂无文档内容</div>;
+  }
+
   return (
     <div className="flex h-full flex-col bg-white">
       <div className="border-b border-gray-100 px-5 py-4">
@@ -355,66 +420,41 @@ export default function KnowledgeDetail({ collectionId, selectedDocument }: Know
           >
             <div className="mb-2 flex items-center justify-between">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Preview</p>
-              <button
-                type="button"
-                onClick={() => setPreviewExpanded((prev) => !prev)}
-                className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-gray-500 transition hover:bg-white hover:text-indigo-600"
-              >
-                {previewExpanded ? (
-                  <>
-                    <Minimize2 size={12} />
-                    收起
-                  </>
-                ) : (
-                  <>
-                    <Maximize2 size={12} />
-                    展开阅读
-                  </>
-                )}
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(true)}
+                  className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-gray-500 transition hover:bg-white hover:text-indigo-600"
+                  title="在新窗口中阅读"
+                >
+                  <ExternalLink size={12} />
+                  弹窗阅读
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewExpanded((prev) => !prev)}
+                  className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-gray-500 transition hover:bg-white hover:text-indigo-600"
+                >
+                  {previewExpanded ? (
+                    <>
+                      <Minimize2 size={12} />
+                      收起
+                    </>
+                  ) : (
+                    <>
+                      <Maximize2 size={12} />
+                      展开阅读
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
             <div
               className={`overflow-auto rounded-xl border border-gray-200/80 bg-white p-3 shadow-sm ${
                 previewExpanded ? 'min-h-0 flex-1' : 'max-h-72'
               }`}
             >
-              {loading ? (
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Loader2 size={14} className="animate-spin" />
-                  加载文档内容中...
-                </div>
-              ) : contentError ? (
-                <div className="text-sm text-red-600">{contentError}</div>
-              ) : content?.kind === 'text' ? (
-                <pre className="whitespace-pre-wrap break-words font-mono text-sm leading-relaxed text-gray-700">
-                  {content.data}
-                </pre>
-              ) : content?.kind === 'image' ? (
-                <img
-                  src={content.data}
-                  alt={selectedDocument.name}
-                  className="mx-auto max-h-full max-w-full rounded-lg object-contain"
-                />
-              ) : content?.kind === 'pdf' ? (
-                <iframe
-                  src={content.data}
-                  title={selectedDocument.name}
-                  className={`w-full rounded-lg ${previewExpanded ? 'h-full' : 'h-64'}`}
-                />
-              ) : content?.kind === 'unsupported' ? (
-                <div className="flex items-center justify-between gap-3 text-xs text-gray-500">
-                  <span>暂不支持在线预览</span>
-                  <a
-                    href={content.data}
-                    download={selectedDocument.name}
-                    className="rounded-lg bg-indigo-600 px-2.5 py-1 text-white transition hover:bg-indigo-700"
-                  >
-                    下载
-                  </a>
-                </div>
-              ) : (
-                <div className="text-sm text-gray-500">暂无文档内容</div>
-              )}
+              {renderPreview('panel')}
             </div>
           </div>
         ) : null}
@@ -512,6 +552,36 @@ export default function KnowledgeDetail({ collectionId, selectedDocument }: Know
           </button>
         </div>
       </div>
+
+      {modalOpen && selectedDocument ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm sm:p-8"
+          onClick={() => setModalOpen(false)}
+        >
+          <div
+            className="flex h-[88vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-6 py-4">
+              <div className="flex min-w-0 items-center gap-2">
+                <FileText size={18} className="shrink-0 text-indigo-500" />
+                <h3 className="truncate text-base font-semibold text-gray-900">{selectedDocument.name}</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setModalOpen(false)}
+                className="shrink-0 rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                aria-label="关闭弹窗"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-auto bg-slate-50/40 p-6">
+              {renderPreview('modal')}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

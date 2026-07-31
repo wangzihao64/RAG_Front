@@ -3,11 +3,11 @@ schema_version: 1
 locale: zh-CN
 branch: main
 nodes_managed: true
-exported_at: "2026-07-31T08:27:14Z"
+exported_at: "2026-07-31T08:47:41Z"
 modules:
     "":
-        dir_name: RAG Front 前端应用（Next.js 着陆页）
-        title: RAG Front 前端应用（Next.js 着陆页）
+        dir_name: AMemoryI RAG 知识库着陆页（Next.js 根项目）
+        title: AMemoryI RAG 知识库着陆页（Next.js 根项目）
         scope:
             - README.md
             - AGENTS.md
@@ -25,8 +25,8 @@ modules:
         depends_on: []
         related_to: []
     pages:
-        dir_name: Next.js 根布局与首页展示
-        title: Next.js 根布局与首页展示
+        dir_name: AMemoryI 着陆页与根布局
+        title: AMemoryI 着陆页与根布局
         scope:
             - app/page.tsx
             - app/layout.tsx

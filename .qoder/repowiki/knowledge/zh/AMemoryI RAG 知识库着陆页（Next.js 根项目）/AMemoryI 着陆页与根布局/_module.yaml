@@ -1,6 +1,6 @@
 schema_version: 1
 module_path: pages
-title: Next.js 根布局与首页展示
+title: AMemoryI 着陆页与根布局
 scope:
     - app/page.tsx
     - app/layout.tsx
