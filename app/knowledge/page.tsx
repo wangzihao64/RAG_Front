@@ -122,7 +122,10 @@ export default function KnowledgePage() {
           />
 
           <div className="min-h-[420px] flex-1 px-2">
-            <KnowledgeDetail selectedDocument={selectedDocument} />
+            <KnowledgeDetail
+              collectionId={selectedCollectionId}
+              selectedDocument={selectedDocument}
+            />
           </div>
         </div>
       </main>
