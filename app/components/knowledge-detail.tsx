@@ -79,6 +79,29 @@ function decodeSSEData(data: string): unknown {
   }
 }
 
+function shouldShowSources(answer: string) {
+  const normalized = answer
+    .replace(/[\s，,。.:：]/g, '')
+    .toLowerCase();
+
+  if (!normalized) return false;
+
+  const refusalMarkers = [
+    '根据现有资料无法回答',
+    '根据提供的资料无法回答',
+    '资料中没有相关信息',
+    '没有相关信息',
+    '无法确定',
+    '无法回答',
+    '无法得知',
+    'insufficientinformation',
+    'cannotanswer',
+    'unabletoanswer',
+  ];
+
+  return !refusalMarkers.some((marker) => normalized.includes(marker));
+}
+
 function formatSourceLabel(source: unknown, index: number) {
   if (typeof source === 'string') {
     return source;
@@ -522,7 +545,9 @@ export default function KnowledgeDetail({ collectionId, selectedDocument, previe
                         : 'rounded-2xl rounded-bl-md border border-gray-100 bg-white px-4 py-3 text-sm text-gray-800 shadow-sm'
                     }`}
                   >
-                    {message.role === 'assistant' && message.sources ? (
+                    {message.role === 'assistant' &&
+                    message.sources &&
+                    shouldShowSources(message.content) ? (
                       <div className="mb-2.5 rounded-xl border border-indigo-100 bg-indigo-50/50 px-3 py-2 text-xs text-indigo-900/80">
                         <div className="mb-1 flex items-center gap-1 font-medium text-indigo-700">
                           <BookOpen size={11} />
