@@ -196,8 +196,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-400">© 2026 AMemoryI. All rights reserved.</p>
           <div className="flex items-center gap-6 text-sm text-gray-500">
-            <a href="mailto:hello@amemoryi.com" className="hover:text-gray-900 transition-colors">
-              hello@amemoryi.com
+            <a href="mailto:w185892713@163.com" className="hover:text-gray-900 transition-colors">
+              w185892713@163.com
             </a>
             <a href="#faq" className="hover:text-gray-900 transition-colors">
               帮助中心
