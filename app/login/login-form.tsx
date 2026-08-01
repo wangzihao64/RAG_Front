@@ -4,6 +4,8 @@ import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { saveAuthToken } from '../lib/auth';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8080';
+
 export function LoginForm() {
   const router = useRouter();
   const [username, setUsername] = useState('');
@@ -21,7 +23,7 @@ export function LoginForm() {
       formData.append('username', username);
       formData.append('password', password);
 
-      const response = await fetch('http://127.0.0.1:8080/api/v1/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
         method: 'POST',
         body: formData,
       });

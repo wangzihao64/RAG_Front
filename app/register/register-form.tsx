@@ -2,6 +2,8 @@
 
 import { FormEvent, useState } from 'react';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8080';
+
 export function RegisterForm() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -22,7 +24,7 @@ export function RegisterForm() {
       formData.append('password', password);
       formData.append('confirm_password', confirmPassword);
 
-      const response = await fetch('http://127.0.0.1:8080/api/v1/auth/register', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
         method: 'POST',
         body: formData,
       });
