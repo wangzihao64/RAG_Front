@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { Library } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { isTokenValid } from '../lib/auth';
 
 const FULL_TEXT = '进入知识库';
 
 export function TypewriterKnowledgeButton() {
+  const router = useRouter();
   const [displayedText, setDisplayedText] = useState('');
   const [showCursor, setShowCursor] = useState(true);
   const [visible, setVisible] = useState(false);
@@ -46,8 +49,15 @@ export function TypewriterKnowledgeButton() {
         visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
       }`}
     >
-      <a
-        href="/knowledge"
+      <button
+        type="button"
+        onClick={() => {
+          if (isTokenValid()) {
+            router.push('/knowledge');
+          } else {
+            router.push('/login');
+          }
+        }}
         className="inline-flex items-center justify-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-7 py-2.5 text-sm font-medium text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-100"
       >
         <Library size={15} />
@@ -61,7 +71,7 @@ export function TypewriterKnowledgeButton() {
             />
           )}
         </span>
-      </a>
+      </button>
     </div>
   );
 }
