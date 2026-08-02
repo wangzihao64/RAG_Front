@@ -1,10 +1,12 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8080';
 
 export function RegisterForm() {
+  const router = useRouter();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,11 +39,15 @@ export function RegisterForm() {
       }
 
       setStatus('success');
-      setMessage('注册成功！');
+      setMessage('注册成功，正在跳转登录页面…');
       setUsername('');
       setEmail('');
       setPassword('');
       setConfirmPassword('');
+
+      setTimeout(() => {
+        router.push('/login');
+      }, 1200);
     } catch (error) {
       setStatus('error');
       setMessage('无法连接到服务器，请稍后再试。');
