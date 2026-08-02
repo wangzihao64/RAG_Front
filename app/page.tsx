@@ -1,4 +1,5 @@
 import { RagDemoChat } from './components/rag-demo-chat';
+import { StartButton } from './components/start-button';
 import { TypewriterKnowledgeButton } from './components/typewriter-knowledge-button';
 import { SiteHeader } from './components/site-header';
 import {
@@ -180,13 +181,7 @@ export default function Home() {
             <p className="text-gray-400 mb-8 max-w-md mx-auto">
               免费注册，上传你的第一份文档，立即体验 RAG 智能问答
             </p>
-            <a
-              href="/knowledge"
-              className="inline-flex items-center gap-2 bg-white text-gray-900 px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors"
-            >
-              立即开始
-              <ArrowRight className="w-4 h-4" />
-            </a>
+            <StartButton />
           </div>
         </section>
       </main>
