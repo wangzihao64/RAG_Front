@@ -130,7 +130,7 @@ export default function KnowledgePage() {
 
         <div
           ref={containerRef}
-          className="flex min-h-[calc(100vh-180px)] overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-[0_8px_30px_rgba(15,23,42,0.06)]"
+          className="flex h-[calc(100vh-116px)] overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-[0_8px_30px_rgba(15,23,42,0.06)]"
         >
           {sidebarCollapsed ? (
             <div
